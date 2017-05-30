@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+
 import pymysql
 import time
+
 
 global lockType
 lockType = 'Ambulance'
@@ -9,15 +12,15 @@ def GetAccess():
     try:
         Ricview = pymysql.connect(host='50.62.209.119',user='richmondavl',passwd='RicAVL123',db='Ricview')
         inCursor = Ricview.cursor()
-        inQuery = '''Select Card_ID,LastName,FirstName from Ambulance_Access;'''
+        inQuery = '''Select Card_ID from Ambulance_Access;'''
         inCursor.execute(inQuery)
 
-        Local = pymysql.connect(host='localhost',user='eLock',passwd='lockpw',db='eLock',autocommit=True)
+        Local = pymysql.connect(host='localhost',user='Lock',passwd='lockpw',db='Lock',autocommit=True)
         outCursor = Local.cursor()
         outCursor.execute('''DELETE FROM Access;''')
-        for (Card_ID,LastName,FirstName) in inCursor:
-            inDictionary = {'Card_ID': Card_ID,'LastName': LastName,'FirstName': FirstName}
-            outQuery = '''INSERT INTO Access (Card_ID,LastName,FirstName) VALUES (%(Card_ID)s,%(LastName)s,%(FirstName)s);'''
+        for (Card_ID) in inCursor:
+            inDictionary = {'Card_ID': Card_ID}
+            outQuery = '''INSERT INTO Access (Card_ID) VALUES (%(Card_ID)s);'''
             outCursor.execute(outQuery,inDictionary)
     except:
         pass
@@ -25,7 +28,7 @@ def GetAccess():
 def PushLog():
     #Push Access to Ricview
     try:
-        Local = pymysql.connect(host='localhost',user='eLock',passwd='lockpw',db='eLock',autocommit=True)
+        Local = pymysql.connect(host='localhost',user='Lock',passwd='lockpw',db='Lock',autocommit=True)
         inCursor = Local.cursor()
         inQuery = '''SELECT Card_ID,LockName,AccessStatus,AccessDateTime FROM AccessLog;'''
         inCursor.execute(inQuery)
